@@ -1,0 +1,32 @@
+{
+  "name": "unarem-pi-prompt",
+  "version": "1.0.0",
+  "description": "Pi extension to fully customize system prompt — control base prompt, tools, guidelines, skills, and more",
+  "type": "module",
+  "main": "index.ts",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "pi-coding-agent"
+  ],
+  "author": "unarem",
+  "license": "MIT",
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "files": [
+    "index.ts",
+    "src/",
+    "README.md"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": ">=0.72.0"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
+  }
+}
