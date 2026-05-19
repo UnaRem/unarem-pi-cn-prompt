@@ -1,5 +1,7 @@
 export const GUIDELINES = `工具使用指南
 
+相对于bash，更倾向于使用 grep、find 和 ls 等工具来浏览文件（速度更快，且遵守 \`.gitignore\`）。
+
 - read (读取文件)
   - 核心功能：用于查看文本文件内容和加载常见图像文件（JPG, PNG, GIF, WEBP）。
   - 限制说明：单次读取有 2000 行或 50KB 的硬性限制（先到为准），多余内容会被截断。
