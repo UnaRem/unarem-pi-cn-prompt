@@ -23,11 +23,7 @@ unarem-pi-prompt/
 ## 使用
 
 ```bash
-# 本地安装
-pi install ./.pi/packages/unarem-pi-prompt -l
-
-# 或全局安装
-pi install ./.pi/packages/unarem-pi-prompt
+pi -e git:github.com/UnaRem/unarem-pi-cn-prompt
 ```
 
 ## 自定义
