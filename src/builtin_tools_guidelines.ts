@@ -1,5 +1,5 @@
 export const GUIDELINES = `
-PI内置工具使用指南
+# PI内置工具使用指南
 
 相对于bash，更倾向于使用 grep、find 和 ls 等工具来浏览文件（速度更快，且遵守 \`.gitignore\`）。
 
@@ -65,4 +65,99 @@ PI内置工具使用指南
     - 审查忽略设置或配置环境时，利用其会自动暴露隐藏文件的特性，进行核验（如检查 \`.gitignore\`、\`.env.*\` 等）。
   - 反模式/规避：
     - 严禁在极其庞大的目录（如包含数十万依赖文件的 \`node_modules\` 文件夹）内直接执行无限制的顶层 \`ls\`，应当逐步下探至具体的目标子目录中运行。
+
+# Semble 工具使用规范
+
+---
+
+## 1. 调用方式
+
+**必须使用 \`bash\` 调用 \`semble\` 命令行，禁止通过 MCP 工具调用。**
+
+\`\`\`bash
+# 正确
+semble search "查询意图" "D:/Projects/EMS/src" -k 10
+
+# 错误 — MCP 调用超时不可靠
+semble_search(...)
+semble_find_related(...)
+\`\`\`
+
+| 方式 | 可靠性 | 说明 |
+|---|---|---|
+| \`bash\` + \`semble\` 命令 | 可靠 | 索引缓存在本地，首次后速度极快 |
+| MCP \`semble_search\` | 经常超时 | 经 MCP 网关转发，延迟高 |
+
+---
+
+## 2. 命令参数
+
+### \`semble search\`
+
+\`\`\`bash
+semble search [-k TOP_K] [-m {hybrid,semantic,bm25}] [--include-text-files] query [path]
+\`\`\`
+
+| 参数 | 说明 | 示例 |
+|---|---|---|
+| \`query\` | 位置参数，自然语言或代码查询 | \`"logger调用中使用%s格式化"\` |
+| \`path\` | 位置参数，搜索目录（默认当前目录） | \`"D:/Projects/EMS/src"\` |
+| \`-k\` | 返回结果数（默认 5） | \`-k 10\` |
+| \`-m\` | 搜索模式：hybrid/semantic/bm25 | \`-m hybrid\` |
+
+### \`semble find-related\`
+
+\`\`\`bash
+semble find-related <file_path> <line> <path> -k 5
+\`\`\`
+
+用于追踪特定代码位置的语义相关代码。注意行号必须在 semble 索引的 chunk 边界内。
+
+---
+
+## 3. 实战经验
+
+### 3.1 跨行代码搜索（grep 盲区）
+
+\`grep\` 的逐行匹配无法捕获跨多行的 logger 调用：
+
+\`\`\`python
+# grep 会漏掉这类跨行调用
+logger.warning(
+    "[PROTECTION] 动作参数校验失败: action=%s rule=%s message=%s",
+    action_type,
+    rule_id,
+    message,
+)
+\`\`\`
+
+**\`semble\` 基于 chunk 索引，天然覆盖跨行代码。**
+
+### 3.2 搜索路径必须精确
+
+\`\`\`bash
+# 精确到 src/，避免索引 node_modules、.git 等大目录
+semble search "..." "D:/Projects/EMS/src" -k 10
+
+# 搜索整个项目根目录可能导致超时
+semble search "..." "D:/Projects/EMS"
+\`\`\`
+
+### 3.3 用 \`pwd\` 验证当前目录再操作
+
+\`\`\`bash
+# 确认工作目录后再执行 git 操作
+cd D:/Projects/EMS && git status
+\`\`\`
+
+---
+
+## 4. 排查流程 SOP
+
+1. **先用 \`semble search\` 全局扫描**，获取问题分布概览
+2. **用 \`semble find-related\`** 追踪关键位置的关联代码
+3. **\`read\` 确认上下文**后再 \`edit\`
+4. **修复后再次 \`semble search\`** 验证零遗漏
+5. **最后用 \`grep\` 做辅助确认**（双保险）
+
 `;
