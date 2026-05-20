@@ -1,38 +1,4 @@
 export const GUIDELINES = `
-命令行工具使用指南
-
-- semble_search（语义搜索代码库）
-  - 核心功能：用中文或英文自然语言描述意图，在代码库中语义搜索匹配的代码片段。支持混合模式（hybrid）、纯语义（semantic）、关键词（bm25）三种搜索策略。
-  - 限制说明：首次调用需建立代码索引（耗时可触发超时），索引缓存后后续查询秒级响应。结果按相关性评分排序。
-  - 最佳实践：
-    - 优先用于按意图/功能查找代码实现（如"PCS启动时功率归零逻辑在哪"），替代全局 grep 盲搜。
-    - 使用 top_k 控制返回数量（默认 5），精确查询设小（3），探索性查询设大（10）。
-    - 默认 mode="hybrid" 适用于大多数场景；纯关键词匹配用 mode="bm25"，纯语义理解用 mode="semantic"。
-    - 搜索结果中返回的 file_path 和行号可直接作为 semble_find_related 的输入参数。
-  - 反模式/规避：
-    - 严禁用 grep 做大范围模糊搜索后再人工筛选 —— semble 一步到位。
-    - 首次索引超时后应重试（索引已缓存），不要放弃改用 grep。
-  - 参数：
-    - query (string, 必填)：自然语言或代码片段查询，支持中文。
-    - repo (union, 必填)：Git URL 或本地目录路径，首次索引后缓存。
-    - mode (enum, 可选)："hybrid"（默认）/ "semantic" / "bm25"。
-    - top_k (integer, 可选)：返回结果数，默认 5。
-- semble_find_related（查找关联代码）
-  - 核心功能：给定一个文件路径和行号，找出项目中与之语义相关的其他代码片段（相似逻辑、同一功能的不同实现、上下游调用等）。
-  - 限制说明：行号必须在 semble 索引的 chunk 边界内，建议直接使用 semble_search 返回结果中的行号作为输入。
-  - 最佳实践：
-    - 修改某行代码前，先用此工具找出所有关联实现点，防止遗漏。
-    - 重构时用于发现同一模式在项目中的其他出现位置。
-    - 行号参数直接复用 semble_search 命中结果的起始行号。
-  - 反模式/规避：
-    - 严禁凭记忆猜测关联代码 —— 必须用此工具验证。
-    - 不要使用自估的行号（可能不在 chunk 边界），应使用 semble_search 结果中的行号。
-  - 参数：
-    - file_path (string, 必填)：文件路径，与 semble_search 返回的 file_path 一致。
-    - line (integer, 必填)：行号（1-indexed），需落在索引 chunk 范围内。
-    - repo (union, 必填)：同 semble_search。
-    - top_k (integer, 可选)：返回的相似代码块数量，默认 5。
-
 PI内置工具使用指南
 
 相对于bash，更倾向于使用 grep、find 和 ls 等工具来浏览文件（速度更快，且遵守 \`.gitignore\`）。
