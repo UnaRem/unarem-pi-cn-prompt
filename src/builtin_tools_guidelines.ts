@@ -1,5 +1,5 @@
 export const GUIDELINES = `
-MCP工具使用指南
+命令行工具使用指南
 
 - semble_search（语义搜索代码库）
   - 核心功能：用中文或英文自然语言描述意图，在代码库中语义搜索匹配的代码片段。支持混合模式（hybrid）、纯语义（semantic）、关键词（bm25）三种搜索策略。
